@@ -49,7 +49,6 @@ jobs:
             sudo systemctl start docker
 
             # Prepara el directorio base
-            #sudo mkdir -p /var/www/html
             sudo chown -R ubuntu:ubuntu /var/www/html
 
             # Entra al directorio
@@ -60,14 +59,17 @@ jobs:
 
             # Clona la última versión del repositorio
             git clone https://github.com/mariodiaz-sv/booksapp-laravel-aws.git
-            #verifica que .env.production exista
-            if [ ! -f .env.production ]; then
-              echo "❌ Error: .env.production no encontrado."
+
+            # Verifica y mueve el archivo .env.production si existe
+            echo "🔍 Verificando existencia de /home/ubuntu/.env.production..."
+            if [ -f /home/ubuntu/.env.production ]; then
+              echo "✅ .env.production encontrado. Moviéndolo al proyecto..."
+              mv /home/ubuntu/.env.production /var/www/html/booksapp-laravel-aws/.env.production
+            else
+              echo "❌ ERROR: El archivo .env.production no existe en /home/ubuntu"
               exit 1
             fi
 
-            cp /home/ubuntu/.env.production /var/www/html/booksapp-laravel-aws/.env.production
-            
             # Entra al proyecto clonado
             cd booksapp-laravel-aws
 
