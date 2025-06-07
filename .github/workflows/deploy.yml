@@ -47,17 +47,25 @@ jobs:
 
             # Asegura que Docker esté activo
             sudo systemctl start docker
+            
+            # Detiene y elimina contenedores e imágenes antiguos
+            echo "🛑 Deteniendo y limpiando contenedores..."
+            docker ps -q | xargs -r docker stop
+            docker system prune -a -f --volumes
+
+            # Elimina el proyecto anterior
+            echo "🧹 Eliminando proyecto anterior..."
+            rm -rf /var/www/html/booksapp-laravel-aws
 
             # Prepara el directorio base
+            sudo mkdir -p /var/www/html
             sudo chown -R ubuntu:ubuntu /var/www/html
 
             # Entra al directorio
             cd /var/www/html
 
-            # Elimina cualquier versión anterior
-            rm -rf booksapp-laravel-aws
-
             # Clona la última versión del repositorio
+            echo "📥 Clonando repositorio..."
             git clone https://github.com/mariodiaz-sv/booksapp-laravel-aws.git
 
             # Verifica y mueve el archivo .env.production si existe
