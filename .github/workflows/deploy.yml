@@ -60,8 +60,13 @@ jobs:
 
             # Clona la última versión del repositorio
             git clone https://github.com/mariodiaz-sv/booksapp-laravel-aws.git
+            #verifica que .env.production exista
+            if [ ! -f .env.production ]; then
+              echo "❌ Error: .env.production no encontrado."
+              exit 1
+            fi
 
-            mv /home/ubuntu/.env.production /var/www/html/booksapp-laravel-aws/.env.production
+            cp /home/ubuntu/.env.production /var/www/html/booksapp-laravel-aws/.env.production
             
             # Entra al proyecto clonado
             cd booksapp-laravel-aws

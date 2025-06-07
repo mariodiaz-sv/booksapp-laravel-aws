@@ -21,7 +21,8 @@ services:
       - "80:80"
     volumes:
       - .:/var/www/html
-      - ./Docker/nginx:/etc/nginx/conf.d
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d
+      
     depends_on:
       - app
     networks:
