@@ -41,7 +41,11 @@ sudo mkdir -p /var/www/html && sudo chown -R ubuntu:ubuntu /var/www/html
 
 #echo "• Configurando zona horaria..."
 #sudo timedatectl set-timezone America/Mexico_City
-
+echo "• creando directorio y moviendo env.production..."
+#crear el directorio booksapp-laravel-aws
+mkdir /var/www/html/booksapp-laravel-aws
+#mover el archivo .env.production
+mv /home/ubuntu/.env.production /var/www/html/booksapp-laravel-aws/.env.production
 echo "• Optimizando el sistema..."
 sudo apt upgrade -y && sudo apt autoremove -y
 

@@ -35,15 +35,45 @@ jobs:
             docker -v
             docker compose version
 
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
+      
+      - name: 🚀 Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd booksapp
-            git pull origin main
-            cp .env.production .env
-            docker compose -f docker-compose.prod.yml down
+            echo "👉 Iniciando despliegue en EC2..."
+
+            # Asegura que Docker esté activo
+            sudo systemctl start docker
+
+            # Prepara el directorio base
+            #sudo mkdir -p /var/www/html
+            sudo chown -R ubuntu:ubuntu /var/www/html
+
+            # Entra al directorio
+            cd /var/www/html
+
+            # Elimina cualquier versión anterior
+            rm -rf booksapp-laravel-aws
+
+            # Clona la última versión del repositorio
+            git clone https://github.com/mariodiaz-sv/booksapp-laravel-aws.git
+
+            mv /home/ubuntu/.env.production /var/www/html/booksapp-laravel-aws/.env.production
+            
+            # Entra al proyecto clonado
+            cd booksapp-laravel-aws
+
+            # Verifica que docker-compose.prod.yml existe
+            if [ ! -f docker-compose.prod.yml ]; then
+              echo "❌ Error: docker-compose.prod.yml no encontrado."
+              exit 1
+            fi
+
+            # Despliega con Docker Compose en modo producción
+            echo "🚀 Levantando contenedores de producción..."
             docker compose -f docker-compose.prod.yml up -d --build
+
+            echo "✅ Despliegue finalizado correctamente."
