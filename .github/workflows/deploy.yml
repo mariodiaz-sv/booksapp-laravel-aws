@@ -20,7 +20,7 @@ jobs:
           php-version: 8.3
 
       - name: Install dependencies
-        run: composer install --no-dev --optimize-autoloader
+        run: composer install --prefer-dist --no-interaction --no-progress
 
       - name: Run Tests
         run: vendor/bin/phpunit
