@@ -99,12 +99,11 @@ jobs:
             docker exec booksapp-laravel-prod composer install --no-dev --optimize-autoloader
 
             # Ajusta permisos para Laravel
-            echo "🔧 Ajustando permisos..."
+            echo "Ajustando permisos..."
             docker exec booksapp-laravel-prod chown -R www-data:www-data /var/www/html
             docker exec booksapp-laravel-prod chmod -R 755 /var/www/html
             # Verifica que vendor/autoload.php existe
-            echo "✅ Verificando que autoload.php exista
+            echo "✅ Verificando que autoload.php exista"
             docker exec booksapp-laravel-prod ls -l /var/www/html/vendor/autoload.php
-
             echo "✅ Despliegue finalizado correctamente."
 
