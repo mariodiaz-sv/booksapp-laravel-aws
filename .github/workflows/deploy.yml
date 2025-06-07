@@ -91,4 +91,20 @@ jobs:
             echo "🚀 Levantando contenedores de producción..."
             docker compose -f docker-compose.prod.yml up -d --build
 
+            # Espera unos segundos para asegurar que los contenedores estén listos
+            sleep 10
+
+            # Ejecuta composer install dentro del contenedor Laravel
+            echo "📦 Instalando dependencias de Laravel en producción..."
+            docker exec booksapp-laravel-prod composer install --no-dev --optimize-autoloader
+
+            # Ajusta permisos para Laravel
+            echo "🔧 Ajustando permisos..."
+            docker exec booksapp-laravel-prod chown -R www-data:www-data /var/www/html
+            docker exec booksapp-laravel-prod chmod -R 755 /var/www/html
+            # Verifica que vendor/autoload.php existe
+            echo "✅ Verificando que autoload.php exista
+            docker exec booksapp-laravel-prod ls -l /var/www/html/vendor/autoload.php
+
             echo "✅ Despliegue finalizado correctamente."
+
