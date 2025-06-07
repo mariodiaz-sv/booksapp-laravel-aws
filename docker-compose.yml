@@ -1,0 +1,42 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        user: laravel
+        uid: 1000
+    container_name: laravel-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    networks:
+      - laravel
+    healthcheck:
+      test: ["CMD", "php-fpm", "-t"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+
+  webserver:
+    image: nginx:alpine
+    container_name: laravel-webserver
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - laravel
+    depends_on:
+      app:
+        condition: service_healthy
+
+networks:
+  laravel:
+    name: laravel_network
+    driver: bridge

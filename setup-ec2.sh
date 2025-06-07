@@ -1,0 +1,63 @@
+#!/bin/bash
+# Script para preparar una instancia EC2 Ubuntu para despliegues con GitHub Actions
+# Incluye instalación de Docker, Docker Compose, Git y configuración de permisos
+
+# --- 1. Actualizar el sistema ---
+echo "Actualizando lista de paquetes..."
+sudo apt update -y || { echo "Error al actualizar paquetes"; exit 1; }
+
+# --- 2. Instalar dependencias ---
+echo "Instalando paquetes requeridos..."
+sudo apt install -y \
+    docker.io \
+    docker-compose \
+    git \
+    unzip || { echo "Error al instalar paquetes"; exit 1; }
+
+# --- 3. Configurar Docker ---
+echo "Configurando Docker..."
+sudo systemctl enable --now docker || { echo "Error al iniciar Docker"; exit 1; }
+
+# --- 4. Agregar usuario ubuntu al grupo docker ---
+echo "Agregando usuario ubuntu al grupo docker..."
+sudo usermod -aG docker ubuntu || { echo "Error al modificar grupos"; exit 1; }
+
+# --- 5. Aplicar cambios de grupo sin reiniciar ---
+echo "Actualizando grupos de usuario..."
+newgrp docker << EOF || { echo "Error al actualizar grupos"; exit 1; }
+echo "Grupos actualizados temporalmente"
+EOF
+
+# --- 6. Verificar instalaciones ---
+echo "Verificando versiones instaladas..."
+docker --version || { echo "Docker no se instaló correctamente"; exit 1; }
+docker-compose --version || { echo "Docker Compose no se instaló correctamente"; exit 1; }
+git --version || { echo "Git no se instaló correctamente"; exit 1; }
+
+# --- 7. Configuración adicional recomendada ---
+echo "Configuración adicional:"
+echo "• Creando directorio para la aplicación..."
+sudo mkdir -p /var/www/html && sudo chown -R ubuntu:ubuntu /var/www/html
+
+#echo "• Configurando zona horaria..."
+#sudo timedatectl set-timezone America/Mexico_City
+
+echo "• Optimizando el sistema..."
+sudo apt upgrade -y && sudo apt autoremove -y
+
+# --- 8. Mensaje final ---
+cat << EOF
+
+✅ Instalación completada correctamente
+--------------------------------------------------
+Recuerda:
+1. Configurar tus secrets en GitHub Actions:
+   - EC2_SSH_KEY: Clave privada PEM
+   - EC2_IP: ${Public IPv4 DNS}
+
+2. Tu aplicación se desplegará en:
+   /var/www/html
+
+3. Para probar la conexión manualmente:
+   ssh -i tu_key.pem ubuntu@$(curl -s http://tu_ip_publica/latest/meta-data/public-ipv4)
+EOF

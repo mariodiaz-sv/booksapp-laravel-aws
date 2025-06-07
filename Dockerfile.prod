@@ -1,0 +1,40 @@
+# booksapp/Dockerfile.prod
+FROM php:8.3-fpm-alpine
+
+# Instala dependencias del sistema
+RUN apk add --no-cache \
+    bash \
+    git \
+    curl \
+    zip \
+    unzip \
+    libzip-dev \
+    oniguruma-dev \
+    postgresql-dev \
+    nginx \
+    supervisor
+
+# Instala extensiones de PHP
+RUN docker-php-ext-install pdo pdo_pgsql zip
+
+# Instala Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Crea directorio de la app
+WORKDIR /var/www/html
+
+# Copia código
+COPY . .
+
+# Instala dependencias de Laravel
+RUN composer install --optimize-autoloader --no-dev
+
+# Permisos y cache
+RUN chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
+
+EXPOSE 9000
+
+CMD ["php-fpm"]

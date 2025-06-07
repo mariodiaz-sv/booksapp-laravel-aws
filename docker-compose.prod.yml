@@ -1,0 +1,32 @@
+
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: booksapp-laravel-prod
+    container_name: booksapp-laravel-prod
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+    networks:
+      - booksapp
+
+  nginx:
+    image: nginx:alpine
+    container_name: booksapp-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html
+      - ./Docker/nginx:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - booksapp
+
+networks:
+  booksapp:
+    driver: bridge
