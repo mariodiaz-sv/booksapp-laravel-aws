@@ -24,6 +24,16 @@ jobs:
 
       #- name: Run Tests
       #  run: vendor/bin/phpunit
+      
+      - name: Verificar Docker Compose en EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker -v
+            docker compose version
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
