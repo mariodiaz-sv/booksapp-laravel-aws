@@ -71,8 +71,9 @@ jobs:
             # Verifica y mueve el archivo .env.production si existe
             echo "🔍 Verificando existencia de /home/ubuntu/.env.production..."
             if [ -f /home/ubuntu/.env.production ]; then
-              echo "✅ .env.production encontrado. Moviéndolo al proyecto..."
-              mv /home/ubuntu/.env.production /var/www/html/booksapp-laravel-aws/.env.production
+            # Copia el archivo .env dentro del contenedor como .env
+            echo "📄 Copiando .env.production a la instancia..."
+              cp /home/ubuntu/.env.production /var/www/html/booksapp-laravel-aws/.env.production
             else
               echo "❌ ERROR: El archivo .env.production no existe en /home/ubuntu"
               exit 1
@@ -105,5 +106,21 @@ jobs:
             # Verifica que vendor/autoload.php existe
             echo "✅ Verificando que autoload.php exista"
             docker exec booksapp-laravel-prod ls -l /var/www/html/vendor/autoload.php
+            # Copia el archivo .env dentro del contenedor como .env
+            echo "📄 Copiando .env.production dentro del contenedor como .env..."
+            docker cp /var/www/html/booksapp-laravel-aws/.env.production booksapp-laravel-prod:/var/www/html/.env
+
+            # Genera la clave de aplicación
+            echo "🔑 Generando APP_KEY..."
+            docker exec booksapp-laravel-prod php artisan key:generate
+
+            # Cachea la configuración
+            echo "⚙️ Cacheando configuración..."
+            docker exec booksapp-laravel-prod php artisan config:cache
+
+            # Reinicia el contenedor para aplicar cambios
+            echo "🔁 Reiniciando contenedor Laravel..."
+            docker restart booksapp-laravel-prod
+
             echo "✅ Despliegue finalizado correctamente."
 
