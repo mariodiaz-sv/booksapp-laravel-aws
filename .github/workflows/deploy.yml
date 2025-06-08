@@ -87,7 +87,20 @@ jobs:
               echo "❌ Error: docker-compose.prod.yml no encontrado."
               exit 1
             fi
+            # Crea certificados SSL auto-firmados si no existen
+            echo "🔐 Generando certificados SSL auto-firmados..."
+            mkdir -p docker/nginx/certs
 
+            if [ ! -f docker/nginx/certs/selfsigned.crt ] || [ ! -f docker/nginx/certs/selfsigned.key ]; then
+              openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+                -keyout docker/nginx/certs/selfsigned.key \
+                -out docker/nginx/certs/selfsigned.crt \
+                -subj "/C=US/ST=Test/L=Local/O=Test/CN=52.91.1.230"
+              echo "✅ Certificados generados en docker/nginx/certs/"
+            else
+              echo "🔁 Certificados SSL ya existen, omitiendo generación..."
+            fi
+            
             # Despliega con Docker Compose en modo producción
             echo "🚀 Levantando contenedores de producción..."
             docker compose -f docker-compose.prod.yml up -d --build
