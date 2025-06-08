@@ -1,61 +1,226 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📚 BooksApp Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplicación CRUD de libros desarrollada con Laravel 12, lista para desarrollo local y despliegue en producción con Docker, CI/CD, EC2 y RDS PostgreSQL.
 
-## About Laravel
+Desarrollado por [mariodiaz-sv](https://github.com/mariodiaz-sv)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Tecnologías
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Laravel 12
+- PHP 8.3
+- SQLite (desarrollo)
+- PostgreSQL (producción – Amazon RDS)
+- Docker & Docker Compose
+- Nginx
+- GitHub Actions (CI/CD)
+- AWS EC2 (producción)
+- SSL con certificados autofirmados
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🚀 Requisitos
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- PHP >= 8.3
+- Composer
+- Docker + Docker Compose
+- Git
+- Acceso a una instancia EC2 (Ubuntu)
+- RDS PostgreSQL (Free Tier)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 📦 Instalación local (desarrollo con SQLite)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. Clona el repositorio:
 
-### Premium Partners
+```bash
+git clone https://github.com/mariodiaz-sv/booksapp-laravel-aws.git
+cd booksapp-laravel-aws
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+2. Instala las dependencias:
 
-## Contributing
+```bash
+composer install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. Copia el archivo de entorno:
 
-## Code of Conduct
+```bash
+cp .env.example .env
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4. Configura `.env` con SQLite:
 
-## Security Vulnerabilities
+```env
+DB_CONNECTION=sqlite
+DB_DATABASE=/absolute/path/to/database/database.sqlite
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+> Crea el archivo `database/database.sqlite` vacío si no existe.
 
-## License
+```bash
+mkdir -p database
+touch database/database.sqlite
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+5. Genera clave y migraciones:
+
+```bash
+php artisan key:generate
+php artisan migrate
+```
+
+6. Inicia el servidor local:
+
+```bash
+php artisan serve
+```
+
+---
+
+## 🐳 Docker en producción
+
+### 1. Estructura de producción
+
+- `Dockerfile.prod`: Define el contenedor de Laravel
+- `docker-compose.prod.yml`: Laravel + Nginx + SSL
+- `docker/nginx/default.conf`: Configuración de Nginx con HTTPS
+- `.env.production`: Archivo de entorno para producción (fuera del repo)
+
+### 2. Variables de entorno de producción (`.env.production`)
+
+Ejemplo:
+
+```env
+APP_ENV=production
+APP_KEY=base64:...
+APP_DEBUG=false
+APP_URL=https://TU_IP_EC2
+
+DB_CONNECTION=pgsql
+DB_HOST=tu-endpoint-rds.amazonaws.com
+DB_PORT=5432
+DB_DATABASE=booksapp_prod
+DB_USERNAME=postgres
+DB_PASSWORD=tu_password
+```
+
+---
+
+## 🔐 Configuración Nginx con SSL autofirmado
+
+El archivo `docker/nginx/default.conf` redirige HTTP a HTTPS y usa certificados autofirmados ubicados en:
+
+```
+docker/nginx/certs/selfsigned.crt
+docker/nginx/certs/selfsigned.key
+```
+
+Se generan automáticamente durante el despliegue si no existen.
+
+---
+
+## ⚙️ Despliegue automático con GitHub Actions
+
+El archivo [`deploy.yml`](.github/workflows/deploy.yml) realiza:
+
+- Instalación de dependencias
+- Verificación remota de Docker
+- Limpieza del proyecto en EC2
+- Clonación del repo
+- Copia de `.env.production`
+- Generación de certificados
+- `docker-compose -f docker-compose.prod.yml up -d --build`
+- Configuración final de Laravel
+
+### Variables necesarias en GitHub Secrets:
+
+- `EC2_HOST`: IP pública de tu EC2
+- `EC2_SSH_KEY`: Llave privada (PEM) para acceso SSH
+
+---
+
+## 📂 Docker Compose Producción (`docker-compose.prod.yml`)
+
+```yaml
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: booksapp-laravel-prod
+    container_name: booksapp-laravel-prod
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+    networks:
+      - booksapp
+
+  nginx:
+    image: nginx:alpine
+    container_name: booksapp-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/certs:/etc/nginx/certs
+    depends_on:
+      - app
+    networks:
+      - booksapp
+
+networks:
+  booksapp:
+    driver: bridge
+```
+
+---
+
+## 🌐 Acceso en Producción
+
+Después del despliegue exitoso, accede a tu app desde:
+
+```
+https://TU_IP_PUBLICA_EC2
+```
+
+> ⚠️ Al usar certificados autofirmados, tu navegador mostrará una advertencia de seguridad (puedes omitirla para pruebas).
+
+---
+
+## 🧪 Test Unitarios (opcional)
+
+Puedes habilitar PHPUnit en GitHub Actions descomentando:
+
+```yaml
+# - name: Run Tests
+#   run: vendor/bin/phpunit
+```
+
+Y ejecutarlos localmente:
+
+```bash
+php artisan test
+```
+
+---
+
+## 📤 Desplegar manualmente desde tu máquina (opcional)
+
+```bash
+scp -i tu-clave.pem .env.production ubuntu@TU_IP:/home/ubuntu/.env.production
+```
+
+Luego haz push a `main` y GitHub Actions se encargará del resto.
+
+---
+
+## 📄 Licencia
+
+MIT © 2025 [mariodiaz-sv](https://github.com/mariodiaz-sv)
