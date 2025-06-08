@@ -55,7 +55,7 @@ jobs:
 
             # Elimina el proyecto anterior
             echo "🧹 Eliminando proyecto anterior..."
-            rm -rf /var/www/html/booksapp-laravel-aws
+            sudo rm -rf /var/www/html/booksapp-laravel-aws
 
             # Prepara el directorio base
             sudo mkdir -p /var/www/html
@@ -100,6 +100,8 @@ jobs:
             else
               echo "🔁 Certificados SSL ya existen, omitiendo generación..."
             fi
+            echo "🔍 Archivos generados:"
+            ls -l docker/nginx/certs
             
             # Despliega con Docker Compose en modo producción
             echo "🚀 Levantando contenedores de producción..."
@@ -130,6 +132,7 @@ jobs:
             # Cachea la configuración
             echo "⚙️ Cacheando configuración..."
             docker exec booksapp-laravel-prod php artisan config:cache
+            docker exec booksapp-laravel-prod php artisan migrate --force
 
             # Reinicia el contenedor para aplicar cambios
             echo "🔁 Reiniciando contenedor Laravel..."
