@@ -146,47 +146,69 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
+      - name: 🔧 Preparar contenido para Discord
+        id: prepare
+        run: |
+          if [ "${{ needs.build-test-push.result }}" = "success" ]; then
+            TITLE="✅ Despliegue exitoso en EC2"
+            DESCRIPTION="**booksapp-laravel-aws** ha sido desplegado correctamente en AWS EC2 🎉"
+            COLOR=65280
+          else
+            TITLE="❌ Error en el despliegue en EC2"
+            DESCRIPTION="Se produjo un error durante el despliegue de **booksapp-laravel-aws** en EC2."
+            COLOR=16711680
+          fi
+
+          EMBED_JSON=$(jq -nc --arg title "$TITLE" \
+                                --arg description "$DESCRIPTION" \
+                                --arg timestamp "${{ github.event.head_commit.timestamp }}" \
+                                --arg commit "${{ github.event.head_commit.message }}" \
+                                --arg author "${{ github.event.head_commit.author.name }}" \
+                                --arg url "${{ github.event.head_commit.url }}" \
+                                '[
+                                    {
+                                      title: $title,
+                                      description: $description,
+                                      color: '"$COLOR"',
+                                      fields: [
+                                        {
+                                          name: "📘 Repositorio",
+                                          value: "[mariodiaz-sv/booksapp-laravel-aws](https://github.com/mariodiaz-sv/booksapp-laravel-aws)",
+                                          inline: true
+                                        },
+                                        {
+                                          name: "🕒 Fecha",
+                                          value: $timestamp,
+                                          inline: true
+                                        },
+                                        {
+                                          name: "🔁 Commit",
+                                          value: $commit
+                                        },
+                                        {
+                                          name: "👤 Autor",
+                                          value: $author,
+                                          inline: true
+                                        },
+                                        {
+                                          name: "🔗 Ver commit",
+                                          value: "[Click aquí](" + $url + ")",
+                                          inline: true
+                                        }
+                                      ],
+                                      footer: {
+                                        text: "GitHub Actions - Laravel EC2 Deploy",
+                                        icon_url: "https://avatars.githubusercontent.com/u/44036562?s=200&v=4"
+                                      }
+                                    }
+                                  ]')
+
+          echo "embeds=$EMBED_JSON" >> $GITHUB_OUTPUT
+
       - name: 📢 Notificación en Discord
         uses: tsickert/discord-webhook@v5.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
           username: 'GitHub Actions 🤖APP'
           avatar-url: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'
-          embeds: |
-            [
-              {
-                "title": "${{ needs.build-test-push.result == 'success' && '✅ Despliegue exitoso en EC2' || '❌ Error en el despliegue en EC2' }}",
-                "description": "${{ needs.build-test-push.result == 'success' && '**booksapp-laravel-aws** ha sido desplegado correctamente en AWS EC2 🎉' || 'Se produjo un error durante el despliegue de **booksapp-laravel-aws** en EC2.' }}",
-                "color": ${{ needs.build-test-push.result == 'success' && 65280 || 16711680 }},
-                "fields": [
-                  {
-                    "name": "📘 Repositorio",
-                    "value": "[mariodiaz-sv/booksapp-laravel-aws](https://github.com/mariodiaz-sv/booksapp-laravel-aws)",
-                    "inline": true
-                  },
-                  {
-                    "name": "🕒 Fecha",
-                    "value": "${{ github.event.head_commit.timestamp }}",
-                    "inline": true
-                  },
-                  {
-                    "name": "🔁 Commit",
-                    "value": "${{ github.event.head_commit.message }}"
-                  },
-                  {
-                    "name": "👤 Autor",
-                    "value": "${{ github.event.head_commit.author.name }}",
-                    "inline": true
-                  },
-                  {
-                    "name": "🔗 Ver commit",
-                    "value": "[Click aquí](${{ github.event.head_commit.url }})",
-                    "inline": true
-                  }
-                ],
-                "footer": {
-                  "text": "GitHub Actions - Laravel EC2 Deploy",
-                  "icon_url": "https://avatars.githubusercontent.com/u/44036562?s=200&v=4"
-                }
-              }
-            ]
+          embeds: ${{ steps.prepare.outputs.embeds }}
