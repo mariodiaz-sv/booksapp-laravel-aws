@@ -147,7 +147,6 @@ jobs:
     if: always()
     steps:
       - name: 🔧 Preparar contenido para Discord
-        id: prepare
         run: |
           if [ "${{ needs.build-test-push.result }}" = "success" ]; then
             TITLE="✅ Despliegue exitoso en EC2"
@@ -159,7 +158,7 @@ jobs:
             COLOR=16711680
           fi
 
-          EMBED_JSON=$(jq -nc \
+          jq -nc \
             --arg title "$TITLE" \
             --arg description "$DESCRIPTION" \
             --arg timestamp "${{ github.event.head_commit.timestamp }}" \
@@ -206,13 +205,12 @@ jobs:
                   }
                 }
               ]
-            }')
-
-          echo "$EMBED_JSON" > payload.json
+            }' > payload.json
 
       - name: 📢 Notificación en Discord
-        uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        with:
-          args: "$(cat payload.json)"
+        run: |
+          curl -H "Content-Type: application/json" \
+              -X POST \
+              -d @payload.json \
+              "${{ secrets.DISCORD_WEBHOOK }}"
+
