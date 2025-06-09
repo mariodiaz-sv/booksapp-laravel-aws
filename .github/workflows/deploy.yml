@@ -141,24 +141,23 @@ jobs:
             echo "✅ Despliegue finalizado correctamente."
 
   notify:
-    name: Notificar a Discord
-    runs-on: ubuntu-latest
+    name: 📢 Notificar a Discord
     needs: build-test-push
+    runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: 📢 Notificación en caso de éxito o error
+      - name: 📢 Notificación en Discord
         uses: tsickert/discord-webhook@v5.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
-          content: "${{ job.status == 'success' && '✅ Despliegue exitoso en EC2' || '❌ Despliegue fallido en EC2' }}"
-          username: 'GitHub Actions 🤖'
+          username: 'GitHub Actions 🤖APP'
           avatar-url: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'
           embeds: |
             [
               {
-                "title": "${{ job.status == 'success' && 'Despliegue exitoso 🚀' || 'Error en el despliegue 🔥' }}",
-                "description": "${{ job.status == 'success' && '**booksapp-laravel-aws** ha sido desplegado correctamente en AWS EC2.' || 'Se produjo un error durante el despliegue de **booksapp-laravel-aws**.' }}",
-                "color": ${{ job.status == 'success' && 65280 || 16711680 }},
+                "title": "${{ needs.build-test-push.result == 'success' && '✅ Despliegue exitoso en EC2' || '❌ Error en el despliegue en EC2' }}",
+                "description": "${{ needs.build-test-push.result == 'success' && '**booksapp-laravel-aws** ha sido desplegado correctamente en AWS EC2 🎉' || 'Se produjo un error durante el despliegue de **booksapp-laravel-aws** en EC2.' }}",
+                "color": ${{ needs.build-test-push.result == 'success' && 65280 || 16711680 }},
                 "fields": [
                   {
                     "name": "📘 Repositorio",
@@ -181,28 +180,13 @@ jobs:
                   },
                   {
                     "name": "🔗 Ver commit",
-                    "value": "[Link](${{ github.event.head_commit.url }})",
+                    "value": "[Click aquí](${{ github.event.head_commit.url }})",
                     "inline": true
                   }
                 ],
                 "footer": {
-                  "text": "GitHub Actions - Laravel Deploy",
+                  "text": "GitHub Actions - Laravel EC2 Deploy",
                   "icon_url": "https://avatars.githubusercontent.com/u/44036562?s=200&v=4"
                 }
-              }
-            ]
-          components: |
-            [
-              {
-                "type": 1,
-                "components": [
-                  {
-                    "type": 2,
-                    "style": 5,
-                    "label": "🔍 Ver logs del deploy",
-                    "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-                    "disabled": false
-                  }
-                ]
               }
             ]
