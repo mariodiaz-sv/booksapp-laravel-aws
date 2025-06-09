@@ -160,48 +160,48 @@ jobs:
           fi
 
           EMBED_JSON=$(jq -nc --arg title "$TITLE" \
-                                --arg description "$DESCRIPTION" \
-                                --arg timestamp "${{ github.event.head_commit.timestamp }}" \
-                                --arg commit "${{ github.event.head_commit.message }}" \
-                                --arg author "${{ github.event.head_commit.author.name }}" \
-                                --arg url "${{ github.event.head_commit.url }}" \
-                                '[
-                                    {
-                                      title: $title,
-                                      description: $description,
-                                      color: '"$COLOR"',
-                                      fields: [
-                                        {
-                                          name: "📘 Repositorio",
-                                          value: "[mariodiaz-sv/booksapp-laravel-aws](https://github.com/mariodiaz-sv/booksapp-laravel-aws)",
-                                          inline: true
-                                        },
-                                        {
-                                          name: "🕒 Fecha",
-                                          value: $timestamp,
-                                          inline: true
-                                        },
-                                        {
-                                          name: "🔁 Commit",
-                                          value: $commit
-                                        },
-                                        {
-                                          name: "👤 Autor",
-                                          value: $author,
-                                          inline: true
-                                        },
-                                        {
-                                          name: "🔗 Ver commit",
-                                          value: "[Click aquí](" + $url + ")",
-                                          inline: true
-                                        }
-                                      ],
-                                      footer: {
-                                        text: "GitHub Actions - Laravel EC2 Deploy",
-                                        icon_url: "https://avatars.githubusercontent.com/u/44036562?s=200&v=4"
-                                      }
-                                    }
-                                  ]')
+                      --arg description "$DESCRIPTION" \
+                      --arg timestamp "${{ github.event.head_commit.timestamp }}" \
+                      --arg commit "${{ github.event.head_commit.message }}" \
+                      --arg author "${{ github.event.head_commit.author.name }}" \
+                      --arg url "${{ github.event.head_commit.url }}" \
+                      '[
+                          {
+                            title: $title,
+                            description: $description,
+                            color: '"$COLOR"',
+                            fields: [
+                              {
+                                name: "📘 Repositorio",
+                                value: "[mariodiaz-sv/booksapp-laravel-aws](https://github.com/mariodiaz-sv/booksapp-laravel-aws)",
+                                inline: true
+                              },
+                              {
+                                name: "🕒 Fecha",
+                                value: $timestamp,
+                                inline: true
+                              },
+                              {
+                                name: "🔁 Commit",
+                                value: $commit
+                              },
+                              {
+                                name: "👤 Autor",
+                                value: $author,
+                                inline: true
+                              },
+                              {
+                                name: "🔗 Ver commit",
+                                value: "[Click aquí](\($url))",
+                                inline: true
+                              }
+                            ],
+                            footer: {
+                              text: "GitHub Actions - Laravel EC2 Deploy",
+                              icon_url: "https://avatars.githubusercontent.com/u/44036562?s=200&v=4"
+                            }
+                          }
+                        ]')
 
           echo "embeds=$EMBED_JSON" >> $GITHUB_OUTPUT
 
