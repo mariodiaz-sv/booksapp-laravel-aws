@@ -150,54 +150,59 @@ jobs:
         uses: tsickert/discord-webhook@v5.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          content: "${{ job.status == 'success' && '✅ Despliegue exitoso en EC2' || '❌ Despliegue fallido en EC2' }}"
           username: 'GitHub Actions 🤖'
           avatar-url: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'
           embeds: |
-            [{
-              "title": "${{ job.status == 'success' && '✅ Despliegue exitoso en EC2' || '❌ Despliegue fallido en EC2' }}",
-              "description": "${{ job.status == 'success' && '**booksapp-laravel-aws** ha sido desplegado correctamente en AWS EC2. 🎉' || 'Se produjo un error durante el despliegue de **booksapp-laravel-aws**. 🚨' }}",
-              "color": ${{ job.status == 'success' && 65280 || 16711680 }},
-              "fields": [
-                {
-                  "name": "📘 Repositorio",
-                  "value": "[mariodiaz-sv/booksapp-laravel-aws](https://github.com/mariodiaz-sv/booksapp-laravel-aws)",
-                  "inline": true
-                },
-                {
-                  "name": "🕒 Fecha",
-                  "value": "${{ github.event.head_commit.timestamp }}",
-                  "inline": true
-                },
-                {
-                  "name": "🔁 Commit",
-                  "value": "${{ github.event.head_commit.message }}"
-                },
-                {
-                  "name": "👤 Autor",
-                  "value": "${{ github.event.head_commit.author.name }}",
-                  "inline": true
-                },
-                {
-                  "name": "🔗 Ver cambios",
-                  "value": "[Ver commit](${{ github.event.head_commit.url }})",
-                  "inline": true
+            [
+              {
+                "title": "${{ job.status == 'success' && 'Despliegue exitoso 🚀' || 'Error en el despliegue 🔥' }}",
+                "description": "${{ job.status == 'success' && '**booksapp-laravel-aws** ha sido desplegado correctamente en AWS EC2.' || 'Se produjo un error durante el despliegue de **booksapp-laravel-aws**.' }}",
+                "color": ${{ job.status == 'success' && 65280 || 16711680 }},
+                "fields": [
+                  {
+                    "name": "📘 Repositorio",
+                    "value": "[mariodiaz-sv/booksapp-laravel-aws](https://github.com/mariodiaz-sv/booksapp-laravel-aws)",
+                    "inline": true
+                  },
+                  {
+                    "name": "🕒 Fecha",
+                    "value": "${{ github.event.head_commit.timestamp }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "🔁 Commit",
+                    "value": "${{ github.event.head_commit.message }}"
+                  },
+                  {
+                    "name": "👤 Autor",
+                    "value": "${{ github.event.head_commit.author.name }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "🔗 Ver commit",
+                    "value": "[Link](${{ github.event.head_commit.url }})",
+                    "inline": true
+                  }
+                ],
+                "footer": {
+                  "text": "GitHub Actions - Laravel Deploy",
+                  "icon_url": "https://avatars.githubusercontent.com/u/44036562?s=200&v=4"
                 }
-              ],
-              "footer": {
-                "text": "GitHub Actions - Laravel Deploy",
-                "icon_url": "https://avatars.githubusercontent.com/u/44036562?s=200&v=4"
               }
-            }]
+            ]
           components: |
-            [{
-              "type": 1,
-              "components": [
-                {
-                  "type": 2,
-                  "style": 5,
-                  "label": "🔍 Ver logs del deploy",
-                  "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-                  "disabled": false
-                }
-              ]
-            }]
+            [
+              {
+                "type": 1,
+                "components": [
+                  {
+                    "type": 2,
+                    "style": 5,
+                    "label": "🔍 Ver logs del deploy",
+                    "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                    "disabled": false
+                  }
+                ]
+              }
+            ]
