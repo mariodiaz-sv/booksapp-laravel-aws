@@ -5,7 +5,34 @@ Aplicación CRUD de libros desarrollada con Laravel 12, lista para desarrollo lo
 Desarrollado por [mariodiaz-sv](https://github.com/mariodiaz-sv)
 
 ---
+## 📊 Diagrama de Arquitectura
 
+```mermaid
+flowchart TD
+    A[Usuario] -->|HTTPS| B[Nginx (EC2)]
+    B -->|Proxy| C[App Laravel (Docker)]
+    C -->|Consulta| D[(PostgreSQL RDS)]
+    C -->|Cache| E[Redis]
+    F[GitHub Actions] -->|CI/CD| B
+    G[Certificados SSL] --> B
+
+    subgraph AWS
+        B --> EC2[EC2 Ubuntu]
+        D --> RDS[RDS PostgreSQL]
+    end
+
+    subgraph Desarrollo
+        H[SQLite] --> C
+    end
+---
+flowchart LR
+    A[Push a Main] --> B[GitHub Actions]
+    B --> C[Build Docker]
+    C --> D[Push a EC2]
+    D --> E[Ejecutar Docker Compose]
+    E --> F[App en Producción]
+
+---
 ## 🛠️ Tecnologías
 
 - Laravel 12
