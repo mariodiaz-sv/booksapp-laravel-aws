@@ -24,19 +24,20 @@ Desarrollado por [mariodiaz-sv](https://github.com/mariodiaz-sv)
 
 ```mermaid
 graph TD
-  A[👨‍💻 Desarrollador] -->|Push a main| B[🔁 GitHub Actions CI/CD]
-  B --> C{¿Claves definidas?}
-  C -- Sí --> D[🔐 Copia .env.production a EC2]
-  D --> E[🐧 Conexión SSH a EC2]
-  E --> F[📦 docker-compose.prod.yml up -d]
-  F --> G[📡 EC2 (Ubuntu + Docker)]
-  G --> H[📂 Contenedor Laravel]
-  G --> I[🌐 Contenedor Nginx]
+  A[Desarrollador] -->|Push a main| B[GitHub Actions CI/CD]
+  B --> C{¿Secrets definidos?}
+  C -- Sí --> D[Copia .env.production a EC2]
+  D --> E[Conexión SSH a EC2]
+  E --> F[Ejecuta docker-compose.prod.yml]
+  F --> G[EC2 (Ubuntu + Docker)]
+  G --> H[Contenedor Laravel]
+  G --> I[Contenedor Nginx]
   H --> J[(Amazon RDS PostgreSQL)]
-  I --> K[🌍 Usuario final con navegador]
+  I --> K[Usuario final con navegador]
   I -->|HTTPS| K
 
-  C -- No --> L[❌ Error: Faltan secretos en GitHub]
+  C -- No --> L[Error: Faltan secrets en GitHub]
+```
 
 ---
 
