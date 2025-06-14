@@ -9,10 +9,10 @@ Desarrollado por [mariodiaz-sv](https://github.com/mariodiaz-sv)
 
 ```mermaid
 flowchart TD
-    Usuario -->|HTTPS| Nginx
-    Nginx -->|Proxy| Laravel
-    Laravel -->|DB| RDS[(RDS PostgreSQL)]
-    GitHub -->|CI/CD| Nginx
+    A[Usuario] --> B[Nginx]
+    B --> C[Laravel]
+    C --> D[(PostgreSQL)]
+    E[GitHub Actions] --> B
 
 ---
 ```mermaid
