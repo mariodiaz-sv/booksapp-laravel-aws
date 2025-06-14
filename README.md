@@ -9,22 +9,17 @@ Desarrollado por [mariodiaz-sv](https://github.com/mariodiaz-sv)
 
 ```mermaid
 flowchart TD
-    A[Usuario] -->|HTTPS| B[Nginx (EC2)]
-    B -->|Proxy| C[App Laravel (Docker)]
-    C -->|Consulta| D[(PostgreSQL RDS)]
-    C -->|Cache| E[Redis]
-    F[GitHub Actions] -->|CI/CD| B
-    G[Certificados SSL] --> B
+    A[Usuario] --> B[Nginx:443]
+    B --> C[Laravel Docker]
+    C --> D[(RDS)]
+    E[GitHub] -->|SSH| F[EC2]
+    F --> B
 
-    subgraph AWS
-        B --> EC2[EC2 Ubuntu]
-        D --> RDS[RDS PostgreSQL]
-    end
+    classDef aws fill:#FF9900,color:#000;
+    class D,F aws;
 
-    subgraph Desarrollo
-        H[SQLite] --> C
-    end
 ---
+
 flowchart LR
     A[Push a Main] --> B[GitHub Actions]
     B --> C[Build Docker]
