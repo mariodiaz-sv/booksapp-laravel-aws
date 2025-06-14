@@ -5,16 +5,7 @@ Aplicación CRUD de libros desarrollada con Laravel 12, lista para desarrollo lo
 Desarrollado por [mariodiaz-sv](https://github.com/mariodiaz-sv)
 
 ---
-## 📊 Diagrama de Arquitectura Principal
 
-```mermaid
-graph TD
-    A[Usuario] --> B[Nginx]
-    B --> C[Laravel]
-    C --> D[(PostgreSQL)]
-    E[GitHub Actions] --> B
-
----
 ## 🛠️ Tecnologías
 
 - Laravel 12
@@ -26,6 +17,26 @@ graph TD
 - GitHub Actions (CI/CD)
 - AWS EC2 (producción)
 - SSL con certificados autofirmados
+
+---
+
+## 📊 Diagrama de arquitectura (Mermaid)
+
+```mermaid
+graph TD
+  A[👨‍💻 Desarrollador] -->|Push a main| B[🔁 GitHub Actions CI/CD]
+  B --> C{¿Claves definidas?}
+  C -- Sí --> D[🔐 Copia .env.production a EC2]
+  D --> E[🐧 Conexión SSH a EC2]
+  E --> F[📦 docker-compose.prod.yml up -d]
+  F --> G[📡 EC2 (Ubuntu + Docker)]
+  G --> H[📂 Contenedor Laravel]
+  G --> I[🌐 Contenedor Nginx]
+  H --> J[(Amazon RDS PostgreSQL)]
+  I --> K[🌍 Usuario final con navegador]
+  I -->|HTTPS| K
+
+  C -- No --> L[❌ Error: Faltan secretos en GitHub]
 
 ---
 
